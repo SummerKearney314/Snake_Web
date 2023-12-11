@@ -207,6 +207,9 @@
                     }
                     break;
             }
+            
+            // Prevent the default behavior for arrow keys
+            event.preventDefault();
         });
 
         function changeColorScheme() {

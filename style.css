@@ -1,53 +1,3 @@
-/* body {
-    background-color: black;
-    color: cyan;
-    font-family: 'ZapfDingbats', sans-serif;
-    margin: 0;
-}
-
-.title {
-    text-align: center;
-    font-size: 80px;
-    margin-bottom: 20px;
-}
-
-.button-panel {
-    text-align: center;
-}
-
-button {
-    background-color: cyan;
-    color: black;
-    font-size: 30px;
-    font-weight: bold;
-    margin: 0 10px;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-}
-
-.game-panel {
-    display: grid;
-    grid-template-columns: repeat(28, 20px); 
-    gap: 1px;
-    margin-top: 20px;
-}
-
-.game-panel div {
-    width: 20px;
-    height: 20px;
-    background-color: black;
-    border: 1px solid cyan;
-}
-
-.snake {
-    background-color: green;
-}
-
-.apple {
-    background-color: red;
-} */
-
 .title-italic-bold {
     font-family: 'ZapfDingbats', sans-serif;
     font-style: italic;
@@ -62,21 +12,22 @@ body {
     height: 100vh;
     margin: 0;
     flex-direction: column;
-    background-color: #f4f4f4; /* Add a background color */
-    font-family: 'Arial', sans-serif; /* Change the font family */
+    background-color: #f4f4f4; 
+    font-family: 'Arial', sans-serif; 
+    display: flex;
 }
 
 canvas {
     display: none;
-    border: 2px solid #333; /* Add a border to the canvas */
     margin: 5% 0px;
+    border: 1px solid #ccc;
 }
 
 #scoreboard-container {
     width: 15%;
-    background-color: #eee; /* Add a background color */
+    background-color: #eee; 
     padding: 10px;
-    border-radius: 8px; /* Add rounded corners */
+    border-radius: 8px; 
 }
 
 #scoreboardList {
@@ -93,47 +44,24 @@ canvas {
 
 #container {
     display: flex;
-    justify-content: space-around; /* Adjust space between game and scoreboard */
+    justify-content: space-around;
     width: 80%;
-    margin-top:4%;
+    margin-top:6%;
 
     padding: 20px;
     border-radius: 10px; /* Add rounded corners */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
-}
-
-
-
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    flex-direction: column;
-}
-
-#container {
-    display: flex;
-    justify-content: space-between; 
-    width: 80%; 
-}
-
-canvas {
-    display: none;
-    border: 1px solid #ccc;
-    margin: 5% 0px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
 }
 
 #title {
     font-size: 30px;
     margin-bottom: 20px;
-    margin-left: 45%;
 }
 
 #buttonContainer {
     display: flex;
-    margin-left: 30%;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 button {
@@ -154,7 +82,11 @@ button {
 }
 
 #game-container {
-    width: 80%; 
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto; 
 }
 
 #scoreboard-container {
@@ -165,6 +97,7 @@ button {
     position: fixed;
     top: 10px;
     right: 7%;
+    height: 20px;
     color: black;
     font-size: 13px;
     padding: 1px 0px;
