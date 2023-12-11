@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Snake Game</title>
+</head>
+<body class="light-theme">
+    <div id="container">
+        <div id="game-container">
+            <div id="title">Snake</div>
+            <div id="buttonContainer">
+                <button onclick="startGame()">Start</button>
+                <button onclick="showInstructions()">Instructions</button>
+                <button id="theme-change-btn" onclick="changeColorScheme()">Change Theme</button>
+            </div>
+            <div id="score" style="display: none;">Score: 0</div>
+            <canvas id="snakeCanvas" width="630" height="630" display="block"></canvas>
+        </div>
+        <div id="score" style="display: none;">Score: 0</div>
+        <div id="scoreboard" style="display: none;">
+            <h3>Scoreboard</h3>
+            <ul id="scoreboardList"></ul>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('snakeCanvas');
+        document.getElementById('snakeCanvas').style.display = 'block';
+        document.getElementById('score').style.display = 'block';
+        document.getElementById('scoreboard').style.display = 'block';
+        showScoreboard();
+        const ctx = canvas.getContext('2d');
+
+        const gridSize = 20;
+        const gapSize = 1;
+        let snakeLen = 1;
+        let snake = [{ x: 10, y: 10 }];
+        let direction = 'right';
+        let apple = { x: 5, y: 5 };
+        let score = 0;
+        let speed = 200;
+        let gameLoop;
+        let justAteApple = false;
+
+        function drawSnake() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'green';
+            snake.forEach(segment => {
+                const x = segment.x * (gridSize + gapSize);
+                const y = segment.y * (gridSize + gapSize);
+                ctx.fillRect(x, y, gridSize, gridSize);
+            });
+
+            // Draw the apple
+            ctx.fillStyle = 'red';
+            const appleX = apple.x * (gridSize + gapSize);
+            const appleY = apple.y * (gridSize + gapSize);
+            ctx.fillRect(appleX, appleY, gridSize, gridSize);
+}
+
+        function moveSnake() {
+            const head = { ...snake[0] }; //shallow copy of first element kvp
+
+            switch (direction) {
+                case 'up':
+                    head.y -= 1;
+                    break;
+                case 'down':
+                    head.y += 1;
+                    break;
+                case 'left':
+                    head.x -= 1;
+                    break;
+                case 'right':
+                    head.x += 1;
+                    break;
+            }
+
+            snake.unshift(head);
+
+            // Check if the snake ate the apple
+            if (head.x === apple.x && head.y === apple.y) {
+                // increase score and place a new apple
+                score++;
+                document.getElementById('score').innerText = 'Score: ' + score;
+                placeNewApple();
+
+                // Increase speed and set a maximum speed
+                speed = snake.length < 20 ? Math.max(60, speed - snake.length * 1.7) : 40;
+
+                clearInterval(gameLoop);
+                gameLoop = setInterval(moveSnake, speed);
+                snakeLen ++;
+
+                // Set a flag to prevent multiple score increments
+                justAteApple = true;
+                
+            } else {
+                snake.pop();
+
+                // Reset the flag if the snake did not eat an apple
+                justAteApple = false;
+            }
+
+            // Check if the snake collided with the wall or itself
+            if (
+                head.x < 0 || head.x >= canvas.width / (gridSize + gapSize) ||
+                head.y < 0 || head.y >= canvas.height / (gridSize + gapSize) ||
+                isCollision()
+            ) {
+                gameOver();
+            } else {
+                drawSnake();
+            }
+        }
+
+        function isCollision() {
+            // Check if the snake collided with itself
+            return (    
+                snake[0].x < 0 ||
+                snake[0].x >= canvas.width / (gridSize + gapSize) ||
+                snake[0].y < 0 ||
+                snake[0].y >= canvas.height / (gridSize + gapSize) ||
+                snake.slice(1).some(segment => segment.x === snake[0].x && segment.y === snake[0].y)
+            );
+        }
+
+        function placeNewApple() {
+            // make sure the new position is not on the snake
+            do {
+                // generate new position
+                apple.x = Math.floor(Math.random() * (canvas.width / (gridSize + gapSize)));
+                apple.y = Math.floor(Math.random() * (canvas.height / (gridSize + gapSize)));
+            } while (snake.some(segment => segment.x === apple.x && segment.y === apple.y));
+        }
+
+        function resetGame() {
+            snake = [{ x: 10, y: 10 }];
+            direction = 'right';
+            score = 0;
+            document.getElementById('score').innerText = 'Score: ' + score;
+            speed = 200;
+            clearInterval(gameLoop);
+            //gameLoop = setInterval(moveSnake, speed);
+            placeNewApple();
+            drawSnake();
+        }
+
+        function showInstructions() {
+            alert("1. Use arrow keys to move\n2. Eat apples\n3. Avoid walls");
+        }
+
+        function saveScore() {
+            const scores = JSON.parse(localStorage.getItem('snakeScores')) || [];
+            scores.push(score);
+            scores.sort((a, b) => b - a); // Sort scores in descending order
+            localStorage.setItem('snakeScores', JSON.stringify(scores));
+        }
+
+        function showScoreboard() {
+            const scoreboard = document.getElementById('scoreboard');
+            scoreboard.style.display = 'block';
+            const scoreboardList = document.getElementById('scoreboardList');
+            const scores = JSON.parse(localStorage.getItem('snakeScores')) || [];
+            scoreboardList.innerHTML = '';
+            scores.slice(0, 10).forEach((s, index) => {
+                const li = document.createElement('li');
+                li.textContent = `#${index + 1}: ${s}`;
+                scoreboardList.appendChild(li);
+            });
+        }
+
+        function gameOver() {
+            alert('Game Over! Your score is: ' + score);
+            saveScore();
+            showScoreboard();
+            resetGame();
+        }
+
+        function startGame() {
+            gameLoop = setInterval(moveSnake, speed);
+        }
+
+        // Handle keyboard input to change the direction
+        window.addEventListener('keydown', event => {
+            switch (event.key) {
+                case 'ArrowUp':
+                    if (direction !== 'down' || snakeLen == 1) {
+                        direction = 'up';
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (direction !== 'up' || snakeLen == 1) {
+                        direction = 'down';
+                    }
+                    break;
+                case 'ArrowLeft':
+                    if (direction !== 'right' || snakeLen == 1) {
+                        direction = 'left';
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (direction !== 'left' || snakeLen == 1) {
+                        direction = 'right';
+                    }
+                    break;
+            }
+        });
+
+        function changeColorScheme() {
+            const body = document.body;
+            const buttons = document.querySelectorAll('button');
+            const title = document.getElementById('title');
+            const isLightTheme = body.classList.contains('light-theme');
+
+            if (isLightTheme) {
+                body.style.backgroundColor = 'black';
+                body.style.color = 'cyan';
+                title.classList.add('title-italic-bold');
+                buttons.forEach(button => {
+                    button.style.backgroundColor = 'cyan';
+                    button.style.border = '1px solid black';
+                });
+                body.classList.remove('light-theme');
+                body.classList.add('black-theme');
+            } else {
+                body.style.backgroundColor = 'buttonface';
+                body.style.color = 'black';
+                title.classList.remove('title-italic-bold');
+                buttons.forEach(button => {
+                    button.style.backgroundColor = 'buttonface';
+                    button.style.border = '1px solid black';
+                });
+                body.classList.remove('black-theme');
+                body.classList.add('light-theme');
+            }
+        }
+
+        drawSnake(); // Draw initial snake
+    </script>
+</body>
+</html>
