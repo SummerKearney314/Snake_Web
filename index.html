@@ -58,7 +58,7 @@
             const appleX = apple.x * (gridSize + gapSize);
             const appleY = apple.y * (gridSize + gapSize);
             ctx.fillRect(appleX, appleY, gridSize, gridSize);
-}
+        }
 
         function moveSnake() {
             const head = { ...snake[0] }; //shallow copy of first element kvp
@@ -207,7 +207,7 @@
                     }
                     break;
             }
-            
+
             // Prevent the default behavior for arrow keys
             event.preventDefault();
         });
